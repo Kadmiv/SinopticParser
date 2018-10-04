@@ -1,28 +1,46 @@
 package com.gaijin.sinopticparser;
 
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CursorAdapter;
+import android.support.v7.widget.*;
+import android.widget.ListView;
 
 import com.gaijin.sinopticparser.cards.City;
 import com.gaijin.sinopticparser.cards.CityAdapter;
 import com.gaijin.sinopticparser.cards.DayAdapter;
 import com.gaijin.sinopticparser.cards.DaySite;
+import com.gaijin.sinopticparser.cards.Searcher;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements MaterialSearchView.OnQueryTextListener {
     String baseUrl = "https://sinoptik.ua/";
     private static String siteText;
     @BindView(R.id.day_view)
@@ -31,14 +49,22 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     Realm realm = null;
 
     RecyclerView citysView;
+    @BindView(R.id.city_name)
+    Toolbar toolbar;
+
+    MaterialSearchView searchView;
+
+    ListView list;
+    ListViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
+        setSupportActionBar(toolbar);
         ArrayList<City> cityList = loadBD();
+
 
         //Observable<String> values = Observable.just(baseUrl);
 //        JsoupParser jsoupParser = new JsoupParser();
@@ -97,15 +123,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Create menu
         getMenuInflater().inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        list = (ListView) findViewById(R.id.listview);
+        searchView = (MaterialSearchView) findViewById(R.id.search_view);
+        searchView.setMenuItem(searchItem);
         searchView.setOnQueryTextListener(this);
-
-
-        // Create search manager, for searching cities
-//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(
-//                new ComponentName(this, MainActivity.class)));
-//        searchView.setIconifiedByDefault(false);
+        List<String> suggestions = Arrays.asList("udarnik","loboda","clava","udarnik","loboda","clava","udarnik","loboda","clava","udarnik","loboda","clava");//new String[]{"udarnik","loboda","clava"};
+        adapter = new ListViewAdapter(this, suggestions);
+        //searchView.setSuggestions(suggestions);
+        //searchView.setAdapter(adapter);
+        list.setAdapter(adapter);
 
         return true;
     }
@@ -120,15 +146,26 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 //                    @Override
 //                    public ArrayList<String> apply(String link) throws Exception {
 //                        Searcher searcher = new Searcher(link);
-//                        ArrayList<String> cityList = searcher.getSearchingResult(cityName);
-//                        return cityList;
+//                        ArrayList<String> cities = searcher.getSearchingResult(cityName);
+//                        //Log.d("MyLog","Size "+cityList.size()+" firs"+cityList.get(0));
+//                        return cities;
 //                    }
 //                })
 //                .subscribeOn(Schedulers.newThread())
 //                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(day -> createCityRecyclerView(day));
+//                .subscribe(cities -> setSearchSuggestions(cities));
         return true;
     }
+
+    private void setSearchSuggestions(ArrayList<String> cities) {
+
+        String[] suggestions = new String[cities.size()];
+        for (int i = 0; i < cities.size(); i++) {
+            suggestions[i] = cities.get(i);
+        }
+        searchView.setSuggestions(suggestions);
+    }
+
 
     @Override
     public boolean onQueryTextChange(String cityName) {
@@ -151,6 +188,22 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MaterialSearchView.REQUEST_VOICE && resultCode == RESULT_OK) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && matches.size() > 0) {
+                String searchWrd = matches.get(0);
+                if (!TextUtils.isEmpty(searchWrd)) {
+                    searchView.setQuery(searchWrd, false);
+                }
+            }
+
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 }
