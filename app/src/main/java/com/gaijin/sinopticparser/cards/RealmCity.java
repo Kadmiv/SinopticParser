@@ -6,19 +6,20 @@ import io.realm.annotations.Required;
 /**
  * Created by Kachulyak Ivan.
  */
-public class City implements ICity{
+public class RealmCity extends RealmObject implements ICity {
 
     @Required
     private String cityName;
     private String cityRegion;
     private String mainImage;
     private String cityLink;
+
     private int numberOfDay = 5;
 
-    public City() {
+    public RealmCity() {
     }
 
-    public City(String[] resultCity) {
+    public RealmCity(String[] resultCity) {
         cityName = resultCity[0];
         cityRegion = resultCity[1];
         cityLink = resultCity[2];
@@ -48,19 +49,15 @@ public class City implements ICity{
         this.numberOfDay = numberOfDay;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
+    public String toString() {
+        return String.format("City name: %s Region: %s Link: %s", cityName, cityRegion, cityLink);
     }
 
-    public void setCityRegion(String cityRegion) {
-        this.cityRegion = cityRegion;
-    }
-
-    public void setMainImage(String mainImage) {
-        this.mainImage = mainImage;
-    }
-
-    public String toString(){
-        return String.format("City name: %s Region: %s Link: %s",cityName,cityRegion,cityLink);
+    public void clone(City city) {
+        city.setCityLink(this.cityLink);
+        city.setCityName(this.cityName);
+        city.setCityRegion(this.cityRegion);
+        city.setMainImage(this.mainImage);
+        city.setNumberOfDay(this.numberOfDay);
     }
 }

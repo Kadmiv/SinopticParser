@@ -4,10 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/search"
-        android:icon="@android:drawable/ic_menu_search"
-        android:title="Enter city"
+        android:id="@+id/add_city"
+        android:icon="@android:drawable/ic_input_add"
         android:orderInCategory="100"
-        app:showAsAction="collapseActionView|ifRoom" />
+        android:title="Add new city"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/settings"
+        android:icon="@android:drawable/ic_input_add"
+        android:orderInCategory="100"
+        android:title="Settings"
+        app:showAsAction="never" />
 
 </menu>

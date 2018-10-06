@@ -11,12 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="52dp">
 
-        <ListView
-            android:id="@+id/listview"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_below="@+id/search" />
-
         <android.support.v7.widget.Toolbar
             android:id="@+id/city_name"
             android:layout_width="match_parent"
@@ -29,12 +23,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
-        <com.miguelcatalan.materialsearchview.MaterialSearchView
-            android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"></com.miguelcatalan.materialsearchview.MaterialSearchView>
     </FrameLayout>
-
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/day_view"

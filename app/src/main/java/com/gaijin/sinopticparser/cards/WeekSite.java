@@ -1,5 +1,7 @@
 package com.gaijin.sinopticparser.cards;
 
+import com.gaijin.sinopticparser.components.Variables;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -8,12 +10,13 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by Kachulyak Ivan.
  */
-public class WeekSite {
+public class WeekSite implements Variables{
 
     private String cityLink;
 
@@ -31,22 +34,32 @@ public class WeekSite {
         this.numberOfDay = city.getNumberOfDay();
     }
 
-    public void parseWeek() {
-        String sampleFile = "http_day_%s.txt";
+    public WeekSite(String cityLink, int numberOfDay) {
+        this.cityLink = cityLink;
+        this.numberOfDay = numberOfDay;
+    }
 
+
+    public ArrayList<DaySite> parseWeek() {
+        String sampleFile = "http_day_%s.txt";
+        ArrayList<DaySite> listOfDaySite = new ArrayList<>(5);
         long day = new Date().getTime();
 
         for (int i = 0; i < numberOfDay; i++) {
             long linkDay = day + i * LENGTH_OF_DAY;
             Date findData = new Date(linkDay);
             String linkDate = dateFormat.format(findData);
-            String allUrl = String.format("%s/%s", cityLink, linkDate);
-            String baseFile = String.format(sampleFile, findData.getDate());
-            String page = httpConnect(allUrl, baseFile);
+            String allUrl = String.format("%s/%s/%s", MAIN_LINK,cityLink, linkDate);
+            //String baseFile = String.format(sampleFile, findData.getDate());
+            //String page = httpConnect(allUrl, baseFile);
+            String page = httpConnect(allUrl);
             System.out.println("\n" + findData);
             DaySite daySite = parseHtml(page);
+            listOfDaySite.add(daySite);
+
         }
 
+        return listOfDaySite;
     }
 
     private DaySite parseHtml(String page) {
@@ -56,6 +69,40 @@ public class WeekSite {
         day.parseDayInfo(body);
         System.out.println(day.toString());
         return null;
+    }
+
+    private String httpConnect(String baseUrl) {
+        String html = null;
+        int time = 25000;
+
+        System.out.println("File not found ");
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) new URL(baseUrl).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(time);
+            connection.setConnectTimeout(time);
+            connection.setUseCaches(false);
+            connection.connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (connection.getResponseCode() == 200) {
+                BufferedReader fb = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+                String line = null;
+                for (line = fb.readLine(); line != null; line = fb.readLine()) {
+                    html += line;
+                    System.out.println(line);
+                }
+                fb.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //connection.disconnect();
+
+        return html;
     }
 
     private String httpConnect(String baseUrl, String baseFile) {
