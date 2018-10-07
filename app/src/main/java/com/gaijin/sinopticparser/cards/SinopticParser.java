@@ -40,6 +40,8 @@ public class SinopticParser {
 
     private final List<String> dayTimesList = Arrays.asList("p1 bR ", "p3 bR ", "p4 ", "p1 ", "p2 bR ", "p3 ", "p4 bR ",
             "p5 ", "p6 bR ", "p7 ", "p8 ");
+    private final List<String> Times_1 = Arrays.asList("0:00", "3:00", "6:00", "9:00", "12:00", "15:00", "18:00", "21:00");
+    private final List<String> Times_2 = Arrays.asList("3:00", "9:00", "15:00", "21:00");
 
     private WeatherView nowView;
     private String currentTag = "cur";
@@ -72,7 +74,7 @@ public class SinopticParser {
         } catch (Exception exe) {
 
         }
-        Log.d("MyLog", "SinopticParser class daySite.size() "+views.size());
+        Log.d("MyLog", "SinopticParser class daySite.size() " + views.size());
         return views;
     }
 
@@ -100,12 +102,19 @@ public class SinopticParser {
     private ArrayList<WeatherView> parseDay(Element doc, List<String> dayTimesList, List<String> metrics) {
 
         ArrayList<WeatherView> viewList = new ArrayList<>();
+
+        Elements parameters = doc.getElementsByClass(dayTimesList.get(0));
+        List<String> timeOfView = Times_2;
+        if (parameters.size() == 0) {
+            timeOfView = Times_1;
+        }
+
 //        String changedItem = dayTimesList.get(itemForChange) + currentTag;
 //        dayTimesList.set(itemForChange, changedItem);
         for (int i = 0; i < dayTimesList.size(); i++) {
 
             String time = dayTimesList.get(i);
-            Elements parameters = doc.getElementsByClass(time);
+            parameters = doc.getElementsByClass(time);
             WeatherView newView;
 
             // day.get
@@ -123,9 +132,10 @@ public class SinopticParser {
             } else {
                 newView = parseView(parameters, metrics);
             }
+            newView.setTime(timeOfView.get(i));
             viewList.add(newView);
         }
-        Log.d("MyLog", "Sinoptic parser 2 daySite.size() "+viewList.size());
+        Log.d("MyLog", "Sinoptic parser 2 daySite.size() " + viewList.size());
         return viewList;
     }
 

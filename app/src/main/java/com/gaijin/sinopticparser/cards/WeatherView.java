@@ -6,6 +6,7 @@ package com.gaijin.sinopticparser.cards;
 public class WeatherView {
 
     private String image = "";
+    private String time = "";
     private String temp = "";
     private String temp_2 = "";
     private String atmoPressure = "";
@@ -23,7 +24,7 @@ public class WeatherView {
     }
 
     public void setImage(String image) {
-        this.image ="http:"+ image;
+        this.image = "http:" + image;
     }
 
     public String getTemp() {
@@ -82,6 +83,13 @@ public class WeatherView {
         this.shortDescription = shortDescription;
     }
 
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
 
     public String toString() {
         return String.format(" Description: %s\n Image: %s\n Temp 1: %s\n Temp 2: %s\n Atmo Pressure: %s\n " +
