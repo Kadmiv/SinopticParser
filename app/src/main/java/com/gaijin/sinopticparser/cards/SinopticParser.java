@@ -132,7 +132,7 @@ public class SinopticParser {
             } else {
                 newView = parseView(parameters, metrics);
             }
-            newView.setTime(timeOfView.get(i));
+//            newView.setTime(timeOfView.get(i));
             viewList.add(newView);
         }
         Log.d("MyLog", "Sinoptic parser 2 daySite.size() " + viewList.size());

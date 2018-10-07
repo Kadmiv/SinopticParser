@@ -52,7 +52,7 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
         holder.description.setText(weatherView.getShortDescription());
         Picasso.with(context)
                 .load(Uri.parse(dailyWeather.get(position).getImage()))
-                .resize(200, 200)
+                //.resize(200, 200)
                 .into(holder.weatherImage);
 
     }

@@ -9,11 +9,12 @@
     <android.support.v7.widget.CardView
         android:id="@+id/weather_card"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="279dp"
         android:layout_centerInParent="true"
+        app:cardBackgroundColor="@android:color/transparent"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="14dp"
-        tools:layout_editor_absoluteY="14dp">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -21,8 +22,11 @@
 
             <ImageView
                 android:id="@+id/weather_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="63dp"
+                android:layout_height="66dp"
+                android:layout_marginTop="57dp"
+                app:layout_constraintStart_toStartOf="@+id/description"
+                app:layout_constraintTop_toTopOf="@+id/description"
                 app:srcCompat="@android:drawable/ic_menu_camera" />
 
             <TextView

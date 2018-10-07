@@ -1,44 +1,27 @@
 package com.gaijin.sinopticparser;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v7.widget.*;
-import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.Toast;
 
 import com.gaijin.sinopticparser.cards.City;
-import com.gaijin.sinopticparser.cards.CityAdapter;
-import com.gaijin.sinopticparser.cards.DayAdapter;
 import com.gaijin.sinopticparser.cards.DaySite;
 import com.gaijin.sinopticparser.cards.RealmCity;
-import com.gaijin.sinopticparser.cards.Searcher;
-import com.gaijin.sinopticparser.cards.ViewFragmentPagerAdapter;
+import com.gaijin.sinopticparser.cards.DayPagerAdapter;
 import com.gaijin.sinopticparser.cards.WeekSite;
 import com.gaijin.sinopticparser.components.Variables;
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
-import io.reactivex.internal.operators.completable.CompletableTimeout;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -121,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements Variables {
         Log.d("MyLog", "daySite.size() " + daySiteList.size());
 
         pager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new ViewFragmentPagerAdapter(getSupportFragmentManager(), daySiteList);
+        pagerAdapter = new DayPagerAdapter(getSupportFragmentManager(), daySiteList);
         pager.setAdapter(pagerAdapter);
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {

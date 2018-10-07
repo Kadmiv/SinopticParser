@@ -23,11 +23,11 @@ import static android.support.v7.widget.LinearLayoutManager.VERTICAL;
 /**
  * Created by Kachulyak Ivan.
  */
-public class ViewFragmentPagerAdapter extends FragmentPagerAdapter {
+public class DayPagerAdapter extends FragmentPagerAdapter {
 
     static ArrayList<DaySite> data;
 
-    public ViewFragmentPagerAdapter(FragmentManager fm, ArrayList<DaySite> data) {
+    public DayPagerAdapter(FragmentManager fm, ArrayList<DaySite> data) {
         super(fm);
         this.data = data;
     }
