@@ -90,6 +90,14 @@ public class DaySite {
         return weatherOnDay;
     }
 
+    public String getMainImage() {
+        return mainImage;
+    }
+
+    public void setMainImage(String mainImage) {
+        this.mainImage = mainImage;
+    }
+
     @Override
     public String toString() {
 

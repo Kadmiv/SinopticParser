@@ -1,6 +1,7 @@
 package com.gaijin.sinopticparser.cards;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,7 +35,7 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.time_layout,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.time_layout, parent, false);
         return new ViewHolder(view);
     }
 
@@ -50,8 +51,8 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
         holder.pressure.setText(weatherView.getAtmoPressure());
         holder.description.setText(weatherView.getShortDescription());
         Picasso.with(context)
-                .load(R.drawable.cup_pic)
-                //.resize(200, 200)
+                .load(Uri.parse(dailyWeather.get(position).getImage()))
+                .resize(200, 200)
                 .into(holder.weatherImage);
 
     }

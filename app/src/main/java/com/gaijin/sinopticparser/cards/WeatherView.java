@@ -23,7 +23,7 @@ public class WeatherView {
     }
 
     public void setImage(String image) {
-        this.image = image;
+        this.image ="http:"+ image;
     }
 
     public String getTemp() {
@@ -86,6 +86,6 @@ public class WeatherView {
     public String toString() {
         return String.format(" Description: %s\n Image: %s\n Temp 1: %s\n Temp 2: %s\n Atmo Pressure: %s\n " +
                         "Humidity: %s\n Wind: %s\n Precipitation: %s",
-                getShortDescription(), getImage(), getTemp(), getTemp_2(), getAtmoPressure(), getHumidity(), getWind(),getPrecipitation());
+                getShortDescription(), getImage(), getTemp(), getTemp_2(), getAtmoPressure(), getHumidity(), getWind(), getPrecipitation());
     }
 }

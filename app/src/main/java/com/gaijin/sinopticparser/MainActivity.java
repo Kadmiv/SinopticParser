@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +24,7 @@ import com.gaijin.sinopticparser.cards.DayAdapter;
 import com.gaijin.sinopticparser.cards.DaySite;
 import com.gaijin.sinopticparser.cards.RealmCity;
 import com.gaijin.sinopticparser.cards.Searcher;
+import com.gaijin.sinopticparser.cards.ViewFragmentPagerAdapter;
 import com.gaijin.sinopticparser.cards.WeekSite;
 import com.gaijin.sinopticparser.components.Variables;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
@@ -46,22 +49,20 @@ import static java.lang.Thread.sleep;
 public class MainActivity extends AppCompatActivity implements Variables {
 
     private static String siteText;
-    @BindView(R.id.day_view)
-    RecyclerView dayView;
 
     Realm realm = null;
 
-    RecyclerView citysView;
+    TabHost tabHost;
 
-
-    MaterialSearchView searchView;
+    ViewPager pager;
+    PagerAdapter pagerAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        //ButterKnife.bind(this);
         Log.d("MyLog", "Load information from BD  ");
         ArrayList<RealmCity> citiesList = loadBD();
 
@@ -70,17 +71,9 @@ public class MainActivity extends AppCompatActivity implements Variables {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         loadWeatherForCities(citiesList);
 
-        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
-
-        tabHost.setup();
-
-        TabHost.TabSpec tabSpec = tabHost.newTabSpec("tag1");
-
-        tabSpec.setContent(R.id.tab1);
-        tabSpec.setIndicator("Сегодня");
-        tabHost.addTab(tabSpec);
 
     }
 
@@ -124,21 +117,29 @@ public class MainActivity extends AppCompatActivity implements Variables {
         return list;
     }
 
-    private void createRecyclerView(ArrayList<DaySite> daySite) {
-        Log.d("MyLog", "daySite.size() "+daySite.size());
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        dayView.setLayoutManager(manager);
-        DaySite day = daySite.get(0);
-        Log.d("MyLog", "daySite.get(0).getWeatherOnDay().size() "+day.getWeatherOnDay().size());
-        DayAdapter adapter = new DayAdapter(this, day.getWeatherOnDay());
-        dayView.setAdapter(adapter);
-    }
+    private void createRecyclerView(ArrayList<DaySite> daySiteList) {
+        Log.d("MyLog", "daySite.size() " + daySiteList.size());
 
-    private void createCityRecyclerView(ArrayList<String> cityList) {
+        pager = (ViewPager) findViewById(R.id.pager);
+        pagerAdapter = new ViewFragmentPagerAdapter(getSupportFragmentManager(), daySiteList);
+        pager.setAdapter(pagerAdapter);
 
-        CityAdapter adapter = new CityAdapter(this, cityList);
-        citysView.setAdapter(adapter);
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
+            @Override
+            public void onPageSelected(int position) {
+                Log.d("MyLog", "onPageSelected, position = " + position);
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset,
+                                       int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
     @Override
