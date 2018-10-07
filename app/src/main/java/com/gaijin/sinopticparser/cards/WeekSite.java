@@ -55,8 +55,10 @@ public class WeekSite implements Variables{
             String page = httpConnect(allUrl);
             System.out.println("\n" + findData);
             DaySite daySite = parseHtml(page);
-            listOfDaySite.add(daySite);
+            System.out.println("\n New Day Site \n");
+            System.out.println(daySite.toString());
 
+            listOfDaySite.add(daySite);
         }
 
         return listOfDaySite;
@@ -67,8 +69,7 @@ public class WeekSite implements Variables{
         Element body = doc.body();
         DaySite day = new DaySite();
         day.parseDayInfo(body);
-        System.out.println(day.toString());
-        return null;
+        return day;
     }
 
     private String httpConnect(String baseUrl) {

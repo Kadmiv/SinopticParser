@@ -35,7 +35,7 @@ import static android.view.KeyEvent.KEYCODE_ENTER;
 /**
  * Created by Kachulyak Ivan.
  */
-class SearchCityActivity extends AppCompatActivity implements TextWatcher,AdapterView.OnItemClickListener, Variables {
+class SearchCityActivity extends AppCompatActivity implements TextWatcher, AdapterView.OnItemClickListener, Variables {
 
 
     @BindView(R.id.cityName)
@@ -47,6 +47,7 @@ class SearchCityActivity extends AppCompatActivity implements TextWatcher,Adapte
 
 
     ArrayAdapter<String> adapter = null;
+    final String NOTHING = "Ничего не найдено!";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,6 @@ class SearchCityActivity extends AppCompatActivity implements TextWatcher,Adapte
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-
         Observable.just(cityName.getText().toString())
                 //.map(string->JsoupParser.getTodayClass(string))
                 .map(new Function<String, ArrayList<String>>() {
@@ -94,6 +94,9 @@ class SearchCityActivity extends AppCompatActivity implements TextWatcher,Adapte
             data.set(i, information);
         }
 
+        if (data.size() == 0) {
+            data.add(NOTHING);
+        }
 
         if (data != null) {
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
@@ -103,11 +106,13 @@ class SearchCityActivity extends AppCompatActivity implements TextWatcher,Adapte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d("MyLog","City is  "+dataForReturn.get(position));
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("cityInfo",dataForReturn.get(position));
-        setResult(Activity.RESULT_OK,returnIntent);
-        finish();
+//        Log.d("MyLog", "City is  " + dataForReturn.get(position));
+        if ( !dataForReturn.get(0).equals(NOTHING)) {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("cityInfo", dataForReturn.get(position));
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
+        }
     }
 
 }

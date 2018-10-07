@@ -1,5 +1,7 @@
 package com.gaijin.sinopticparser.cards;
 
+import android.util.Log;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -70,7 +72,7 @@ public class SinopticParser {
         } catch (Exception exe) {
 
         }
-
+        Log.d("MyLog", "SinopticParser class daySite.size() "+views.size());
         return views;
     }
 
@@ -123,7 +125,7 @@ public class SinopticParser {
             }
             viewList.add(newView);
         }
-
+        Log.d("MyLog", "Sinoptic parser 2 daySite.size() "+viewList.size());
         return viewList;
     }
 

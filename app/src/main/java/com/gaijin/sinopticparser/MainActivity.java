@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.*;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.gaijin.sinopticparser.cards.City;
@@ -51,8 +52,7 @@ public class MainActivity extends AppCompatActivity implements Variables {
     Realm realm = null;
 
     RecyclerView citysView;
-    @BindView(R.id.city_name)
-    Toolbar toolbar;
+
 
     MaterialSearchView searchView;
 
@@ -71,6 +71,16 @@ public class MainActivity extends AppCompatActivity implements Variables {
             e.printStackTrace();
         }
         loadWeatherForCities(citiesList);
+
+        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+
+        tabHost.setup();
+
+        TabHost.TabSpec tabSpec = tabHost.newTabSpec("tag1");
+
+        tabSpec.setContent(R.id.tab1);
+        tabSpec.setIndicator("Сегодня");
+        tabHost.addTab(tabSpec);
 
     }
 
@@ -170,7 +180,9 @@ public class MainActivity extends AppCompatActivity implements Variables {
             realm.beginTransaction();
             realm.insert(city);
             realm.commitTransaction();
+            ArrayList<RealmCity> citiesList = loadBD();
 
+            //loadWeatherForCities(citiesList);
 
             return;
         }

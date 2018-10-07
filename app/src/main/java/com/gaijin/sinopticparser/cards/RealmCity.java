@@ -14,7 +14,7 @@ public class RealmCity extends RealmObject implements ICity {
     private String mainImage;
     private String cityLink;
 
-    private int numberOfDay = 5;
+    private int numberOfDay = 2;
 
     public RealmCity() {
     }

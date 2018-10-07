@@ -1,6 +1,8 @@
 package com.gaijin.sinopticparser.cards;
 
 
+import android.util.Log;
+
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -84,6 +86,7 @@ public class DaySite {
     }
 
     public ArrayList<WeatherView> getWeatherOnDay() {
+        Log.d("MyLog", "DaySite class daySite.size() "+weatherOnDay.size());
         return weatherOnDay;
     }
 
