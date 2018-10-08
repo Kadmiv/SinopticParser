@@ -6,7 +6,8 @@
     <string name="entry_name">Entry name</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">Sinoptic Launcher</string>
+    <string name="nav_header_subtitle">Developed with love by Kadmiv</string>
     <string name="nav_header_desc">Navigation header</string>
+    <string name="add_new_city">Add new city</string>
 </resources>

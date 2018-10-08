@@ -1,18 +1,28 @@
-package com.gaijin.sinopticparser.cards;
+package com.gaijin.sinopticparser.views.fragments;
 
-import io.realm.RealmObject;
+import com.gaijin.sinopticparser.components.ICity;
+
 import io.realm.annotations.Required;
 
 /**
  * Created by Kachulyak Ivan.
+ * <p>
+ * This class is clone of RealmCity
+ * This class was create because RealmCity class and other RealmObjects
+ * can't used in not main threads
  */
-public class City implements ICity{
+public class City implements ICity {
 
     @Required
+    //Name of city
     private String cityName;
+    //Region of city
     private String cityRegion;
+    //Image of city or region - now not used
     private String mainImage;
+    //Ling from web site Sinoptioc for city
     private String cityLink;
+    // Numbers of day, which will parsed from site for city
     private int numberOfDay = 5;
 
     public City() {
@@ -60,7 +70,7 @@ public class City implements ICity{
         this.mainImage = mainImage;
     }
 
-    public String toString(){
-        return String.format("City name: %s Region: %s Link: %s",cityName,cityRegion,cityLink);
+    public String toString() {
+        return String.format("City name: %s Region: %s Link: %s", cityName, cityRegion, cityLink);
     }
 }

@@ -1,4 +1,7 @@
-package com.gaijin.sinopticparser.cards;
+package com.gaijin.sinopticparser.db;
+
+import com.gaijin.sinopticparser.views.fragments.City;
+import com.gaijin.sinopticparser.components.ICity;
 
 import io.realm.RealmObject;
 import io.realm.annotations.Required;

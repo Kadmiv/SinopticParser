@@ -1,4 +1,4 @@
-package com.gaijin.sinopticparser.cards;
+package com.gaijin.sinopticparser.components;
 
 /**
  * Created by Kachulyak Ivan.

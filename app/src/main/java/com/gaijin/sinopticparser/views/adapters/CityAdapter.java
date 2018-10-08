@@ -1,4 +1,4 @@
-package com.gaijin.sinopticparser.cards;
+package com.gaijin.sinopticparser.views.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gaijin.sinopticparser.R;
-import com.gaijin.sinopticparser.cards.City;
+import com.gaijin.sinopticparser.views.fragments.City;
 
 import java.util.List;
 

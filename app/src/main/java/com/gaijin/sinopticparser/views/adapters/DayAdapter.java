@@ -1,4 +1,4 @@
-package com.gaijin.sinopticparser.cards;
+package com.gaijin.sinopticparser.views.adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gaijin.sinopticparser.R;
+import com.gaijin.sinopticparser.views.fragments.WeatherView;
 
 import java.util.List;
 

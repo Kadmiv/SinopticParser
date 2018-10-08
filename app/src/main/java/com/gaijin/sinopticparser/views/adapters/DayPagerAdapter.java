@@ -1,7 +1,6 @@
-package com.gaijin.sinopticparser.cards;
+package com.gaijin.sinopticparser.views.adapters;
 
 import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,9 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gaijin.sinopticparser.R;
+import com.gaijin.sinopticparser.views.adapters.DayAdapter;
+import com.gaijin.sinopticparser.parsers_classes.DaySite;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import static android.support.v7.widget.LinearLayoutManager.VERTICAL;
 
