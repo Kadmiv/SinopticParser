@@ -32,6 +32,11 @@ public class DayPagerAdapter extends FragmentPagerAdapter {
         this.data = data;
     }
 
+    public void reloadData(ArrayList<DaySite> data){
+        this.data = data;
+        notifyDataSetChanged();
+    }
+
     @Override
     public Fragment getItem(int position) {
         return ViewPageFragment.newInstance(position);

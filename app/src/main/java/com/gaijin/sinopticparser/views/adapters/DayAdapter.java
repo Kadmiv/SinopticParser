@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gaijin.sinopticparser.R;
-import com.gaijin.sinopticparser.views.fragments.WeatherView;
+import com.gaijin.sinopticparser.views.fragments.SeparateTime;
 
 import java.util.List;
 
@@ -26,9 +26,9 @@ import it.sephiroth.android.library.picasso.Picasso;
 public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
 
     private Context context;
-    private List<WeatherView> dailyWeather;
+    private List<SeparateTime> dailyWeather;
 
-    public DayAdapter(Context context, List<WeatherView> dailyWeather) {
+    public DayAdapter(Context context, List<SeparateTime> dailyWeather) {
         this.context = context;
         this.dailyWeather = dailyWeather;
     }
@@ -43,18 +43,19 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        WeatherView weatherView = dailyWeather.get(position);
-        holder.temp_1.setText(weatherView.getTemp());
-        holder.temp_2.setText(weatherView.getTemp_2());
-        holder.humidity.setText(weatherView.getHumidity());
-        holder.precipitation.setText(weatherView.getPrecipitation());
-        holder.wind.setText(weatherView.getWind());
-        holder.pressure.setText(weatherView.getAtmoPressure());
-        holder.description.setText(weatherView.getShortDescription());
+        SeparateTime separateTime = dailyWeather.get(position);
+        holder.temp_1.setText(separateTime.getTemp());
+        holder.temp_2.setText(separateTime.getTemp_2());
+        holder.humidity.setText(separateTime.getHumidity());
+        holder.precipitation.setText(separateTime.getPrecipitation());
+        holder.wind.setText(separateTime.getWind());
+        holder.pressure.setText(separateTime.getAtmoPressure());
+        holder.description.setText(separateTime.getShortDescription());
         Picasso.with(context)
                 .load(Uri.parse(dailyWeather.get(position).getImage()))
                 //.resize(200, 200)
                 .into(holder.weatherImage);
+        holder.time.setText(separateTime.getTime());
 
     }
 
@@ -79,6 +80,8 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
         TextView humidity;
         @BindView(R.id.description)
         TextView description;
+        @BindView(R.id.time)
+        TextView time;
         @BindView(R.id.weather_image)
         ImageView weatherImage;
 

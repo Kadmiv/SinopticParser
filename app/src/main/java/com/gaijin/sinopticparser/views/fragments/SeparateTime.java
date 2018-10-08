@@ -2,21 +2,26 @@ package com.gaijin.sinopticparser.views.fragments;
 
 /**
  * Created by Kachulyak Ivan.
+ * <p>
+ * This class contains information of weather for separate time of day
  */
-public class WeatherView {
+public class SeparateTime {
 
+    /*Variable which contains link for weather type description*/
     private String image = "";
+    /*Variable which contains time of separate part */
     private String time = "";
+    /*Variables which contains weather parameters*/
     private String temp = "";
     private String temp_2 = "";
     private String atmoPressure = "";
     private String humidity = "";
     private String wind = "";
     private String precipitation = "";
+    /*Variable which contains short description of weather*/
     private String shortDescription = "";
 
-    public WeatherView() {
-
+    public SeparateTime() {
     }
 
     public String getImage() {

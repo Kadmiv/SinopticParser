@@ -25,23 +25,23 @@ public class Searcher implements Variables {
      * @return - list of find city, which meet to request
      */
     public ArrayList<String> getSearchingResult(String request) {
-        int timeOut = 2500;
         ArrayList<String> resultList = new ArrayList<>();
 
         // Create link request
         String link = MAIN_LINK + SEARCH_LINK + request;
+        // Connect to sever
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) new URL(link).openConnection();
-            connection.setRequestMethod("get");
-            connection.setReadTimeout(timeOut);
-            connection.setConnectTimeout(timeOut);
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(TIME_OUT);
+            connection.setConnectTimeout(TIME_OUT);
             connection.setUseCaches(false);
             connection.connect();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        // Get information from connection
         ConnectionReader connector = new ConnectionReader(connection);
         try {
             resultList = connector.getConnectionResultAsList();

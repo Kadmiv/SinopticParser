@@ -1,5 +1,7 @@
 package com.gaijin.sinopticparser.parsers_classes;
 
+import android.util.Log;
+
 import com.gaijin.sinopticparser.components.ConnectionReader;
 import com.gaijin.sinopticparser.components.Variables;
 import com.gaijin.sinopticparser.views.fragments.City;
@@ -15,24 +17,31 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.SchedulerRunnableIntrospection;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by Kachulyak Ivan.
  */
 public class WeekSite implements Variables {
 
-    /*Day length in milliseconds*/
-    private int LENGTH_OF_DAY = 86400000;
-
     /*Variable of day format
      * Need for link of day Example -> https://sinoptik.ua/погода-киев/2018-09-17*/
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
+    SimpleDateFormat dayDateFormat = new SimpleDateFormat("dd.MM.yy");
+    /**/
+    private City city;
     /*City link on site*/
     private String cityLink;
     /*Number of day for parsing */
     private int numberOfDay;
+    private ArrayList<DaySite> listOfDaySite;
 
     public WeekSite(City city) {
+        this.city = city;
         this.cityLink = city.getCityLink();
         this.numberOfDay = city.getNumberOfDay();
     }
@@ -40,26 +49,67 @@ public class WeekSite implements Variables {
     /**
      * This function parse a certain number of days (numberOfDay) weather information for city
      *
-     * @return - list, which contains all needed information for certain number of days
+     * @return -
      */
-    public ArrayList<DaySite> parseWeek() {
-        ArrayList<DaySite> listOfDaySite = new ArrayList<>(numberOfDay);
+    public void parseWeek() {
+        listOfDaySite = new ArrayList<>(numberOfDay);
         long day = new Date().getTime();
 
-        for (int i = 0; i < numberOfDay; i++) {
-            //Calculate date for creation link
-            long linkDay = day + i * LENGTH_OF_DAY;
-            Date findData = new Date(linkDay);
-            String linkDate = dateFormat.format(findData);
-            // Create a single link
-            String allUrl = String.format("%s/%s/%s", MAIN_LINK, cityLink, linkDate);
-            // Connect to server
-            String page = httpConnect(allUrl);
-            // Parse day HTML
-            DaySite daySite = parseHtml(page);
-            listOfDaySite.add(daySite);
-        }
 
+        Observable.range(0, numberOfDay)
+                .flatMap(integer -> Observable.just(integer)
+                        .map(new Function<Integer, DaySite>() {
+                            @Override
+                            public DaySite apply(Integer i) throws Exception {
+                                //Calculate date for creation link
+                                long linkDay = day + i * LENGTH_OF_DAY;
+                                Date findData = new Date(linkDay);
+                                String linkDate = dateFormat.format(findData);
+                                // Create a single link
+                                String allUrl = String.format("%s/%s/%s", MAIN_LINK, cityLink, linkDate);
+                                Log.d("MyLog", "Link " + allUrl + " day " + i);
+                                // Connect to server
+                                String page = httpConnect(allUrl);
+                                // Parse day HTML
+                                DaySite daySite = parseHtml(page);
+                                // Set date of day
+                                daySite.setDate(dayDateFormat.format(findData));
+                                return daySite;
+                            }
+                        })
+                        .subscribeOn(Schedulers.computation())
+                )
+                //.subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.computation())
+                .subscribe(daySite -> addToDaySiteList(daySite));
+
+//        for (int i = 0; i < numberOfDay; i++) {
+//            //Calculate date for creation link
+//            long linkDay = day + i * LENGTH_OF_DAY;
+//            Date findData = new Date(linkDay);
+//            String linkDate = dateFormat.format(findData);
+//            // Create a single link
+//            String allUrl = String.format("%s/%s/%s", MAIN_LINK, cityLink, linkDate);
+//            // Connect to server
+//            String page = httpConnect(allUrl);
+//            // Parse day HTML
+//            DaySite daySite = parseHtml(page);
+//            // Set date of day
+//            daySite.setDate(dayDateFormat.format(findData));
+
+//            listOfDaySite.add(daySite);
+//        }
+    }
+
+    private void addToDaySiteList(DaySite daySite) {
+        //Log.e("MyLog", "Add to daySiteList" + daySite.getCity().getCityName());
+        listOfDaySite.add(daySite);
+    }
+
+    /**
+     * This function return list, which contains all needed information for certain number of days
+     */
+    public ArrayList<DaySite> getListOfDaySite() {
         return listOfDaySite;
     }
 
@@ -71,20 +121,19 @@ public class WeekSite implements Variables {
      */
     private String httpConnect(String link) {
         String html = null;
-        int timeOut = 2500;
-
+        // Connect to sever
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) new URL(link).openConnection();
-            connection.setRequestMethod("get");
-            connection.setReadTimeout(timeOut);
-            connection.setConnectTimeout(timeOut);
+            connection.setRequestMethod("GET");
+            connection.setReadTimeout(TIME_OUT);
+            connection.setConnectTimeout(TIME_OUT);
             connection.setUseCaches(false);
             connection.connect();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        // Get information from connection
         ConnectionReader connector = new ConnectionReader(connection);
         try {
             html = connector.getConnectionResult();
@@ -109,5 +158,9 @@ public class WeekSite implements Variables {
         DaySite day = new DaySite();
         day.parseDayInfo(body);
         return day;
+    }
+
+    public City getCity() {
+        return city;
     }
 }

@@ -13,17 +13,18 @@ import io.realm.annotations.Required;
  */
 public class City implements ICity {
 
+    private static final String WEATHER_IN = "Погода в ";
     @Required
-    //Name of city
+    /* Name of city */
     private String cityName;
-    //Region of city
+    /* Region of city1 */
     private String cityRegion;
-    //Image of city or region - now not used
+    /* Image of city or region - now not used*/
     private String mainImage;
-    //Ling from web site Sinoptioc for city
+    /* Ling from web site Sinoptioc for city */
     private String cityLink;
-    // Numbers of day, which will parsed from site for city
-    private int numberOfDay = 5;
+    /* Numbers of day, which will parsed from site for city */
+    private int numberOfDay ;
 
     public City() {
     }
@@ -72,5 +73,9 @@ public class City implements ICity {
 
     public String toString() {
         return String.format("City name: %s Region: %s Link: %s", cityName, cityRegion, cityLink);
+    }
+
+    public String getWeatherIn(){
+        return WEATHER_IN+cityName;
     }
 }

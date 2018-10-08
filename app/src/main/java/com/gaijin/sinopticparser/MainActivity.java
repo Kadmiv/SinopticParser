@@ -1,7 +1,10 @@
 package com.gaijin.sinopticparser;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.constraint.Group;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -13,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 
 import com.gaijin.sinopticparser.views.fragments.City;
 import com.gaijin.sinopticparser.views.adapters.DayPagerAdapter;
@@ -26,6 +30,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -44,16 +49,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
 
+
     // Object of DB
     Realm realm = null;
     // Adapter for PagerView
-    PagerAdapter pagerAdapter;
+    DayPagerAdapter pagerAdapter;
+    // Change cities submenu in NavigationView
+    SubMenu subMenu;
+    ArrayList<WeekSite> weekSiteList;
+    RealmResults<RealmCity> cityList;
+    SharedPreferences sharedCity;
+    final String cityKey = "city_key";
+    int cityNumber = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        sharedCity = getSharedPreferences(cityKey, Context.MODE_PRIVATE);
+        cityNumber = sharedCity.getInt(cityKey, 0);
 
         this.setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -62,12 +77,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
+        Menu menu = navigationView.getMenu();
+        subMenu = menu.addSubMenu("Cities:");
+
 
         // Load city from BD
         ArrayList<RealmCity> citiesList = loadBD();
         // Find and load information in web site Sinoptic for all cities
-        loadWeatherForCities(citiesList);
+        ArrayList<City> cities = realmListToList(citiesList);
+        loadWeatherForCities(cities);
 
+    }
+
+    private ArrayList<City> realmListToList(ArrayList<RealmCity> citiesList) {
+        ArrayList<City> cloneList = new ArrayList<>();
+        int i = 0;
+        for (RealmCity city : citiesList) {
+            City newCity = new City();
+            city.clone(newCity);
+            cloneList.add(newCity);
+            addToCityGroup(newCity, i);
+            i++;
+        }
+
+        return cloneList;
     }
 
     /**
@@ -80,14 +113,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Initialize Realm (just once per application)
         Realm.init(this);
 
+
         // Get a Realm instance for this thread
         realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-        RealmResults<RealmCity> cityList = realm.where(RealmCity.class).findAll();
+        cityList = realm.where(RealmCity.class).findAll();
 
         ArrayList<RealmCity> list = new ArrayList<>();
         for (RealmCity city : cityList) {
             list.add(city);
+        }
+        // Remove all items from subMenu of city list
+        for (int i = 0; i < list.size(); i++) {
+            try {
+                subMenu.removeItem(i);
+            } catch (Exception ex) {
+
+            }
         }
         realm.commitTransaction();
 
@@ -100,56 +142,77 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      *
      * @param citiesList - list which contains all information for choose cities
      */
-    private void loadWeatherForCities(ArrayList<RealmCity> citiesList) {
+    private void loadWeatherForCities(ArrayList<City> citiesList) {
 
         Log.d("MyLog", "Load information from Internet  ");
-        for (RealmCity city : citiesList) {
-            Log.d("MyLog", city.toString());
-            City newCity = new City();
-            city.clone(newCity);
-            Observable.just(newCity)
-                    .map(new Function<City, ArrayList<DaySite>>() {
-                        @Override
-                        public ArrayList<DaySite> apply(City city) throws Exception {
-                            WeekSite weekSite = new WeekSite(city);
+
+        Observable.fromArray(citiesList)
+                .map(new Function<ArrayList<City>, ArrayList<WeekSite>>() {
+                    @Override
+                    public ArrayList<WeekSite> apply(ArrayList<City> citiesList) throws Exception {
+                        ArrayList<WeekSite> weekSites = new ArrayList<>();
+                        for (int i = 0; i < citiesList.size(); i++) {
+                            City newCity = citiesList.get(i);
+                            Log.d("MyLog", "\n##################\n"
+                                    + newCity.toString()
+                                    + "\n##################\n");
+                            WeekSite weekSite = new WeekSite(newCity);
                             // Parse information from site for choose cities
-                            return weekSite.parseWeek();
+                            weekSite.parseWeek();
+                            weekSites.add(i, weekSite);
                         }
-                    })
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    // Load the received information for view to user
-                    .subscribe(day -> createPagerView(day));
-        }
+
+                        return weekSites;
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                // Load the received information for view to user
+                .subscribe(day -> createPagerView(day));
+    }
+
+    private void addToCityGroup(City city, int itemId) {
+
+        //subMenu.add(city.getCityName());
+        //subMenu.
+        Log.d("MyLog", "City - " + city.getCityName() + " itemID " + itemId);
+        subMenu.add(R.id.city_group, itemId, Menu.NONE, city.getCityName());
+        navigationView.invalidate();
+
     }
 
     /**
      * This function displays information received from web site
      *
-     * @param daySiteList - received information from the site for each day of each city
+     * @param weekSiteList - received information from the site for each day of each city
      */
-    private void createPagerView(ArrayList<DaySite> daySiteList) {
+    private void createPagerView(ArrayList<WeekSite> weekSiteList) {
+        this.weekSiteList = weekSiteList;
 
-        // Create adapter for normalization information for view
-        pagerAdapter = new DayPagerAdapter(getSupportFragmentManager(), daySiteList);
-        pager.setAdapter(pagerAdapter);
+        if (cityNumber < weekSiteList.size() && weekSiteList.get(cityNumber) != null) {
+            Log.d("MyLog", "Pager view must be loaded City id ="+weekSiteList.get(cityNumber).getCity());
+            ArrayList<DaySite> daySiteList = weekSiteList.get(cityNumber).getListOfDaySite();
+            // Create adapter for normalization information for view
+            pagerAdapter = new DayPagerAdapter(getSupportFragmentManager(), daySiteList);
+            pager.setAdapter(pagerAdapter);
 
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-            @Override
-            public void onPageSelected(int position) {
-                Log.d("MyLog", "onPageSelected, position = " + position);
-            }
+                @Override
+                public void onPageSelected(int position) {
+                    Log.d("MyLog", "onPageSelected, position = " + position);
+                }
 
-            @Override
-            public void onPageScrolled(int position, float positionOffset,
-                                       int positionOffsetPixels) {
-            }
+                @Override
+                public void onPageScrolled(int position, float positionOffset,
+                                           int positionOffsetPixels) {
+                }
 
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                }
+            });
+        }
     }
 
 
@@ -188,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Intent intent = null;
 
-        switch (item.getItemId()) {
+        switch (id) {
             case R.id.add_city:
                 //Toast.makeText(this, "Add city", Toast.LENGTH_SHORT).show();
                 intent = new Intent(this, SearchCityActivity.class);
@@ -199,12 +262,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 //intent = new Intent(this, SearchCityActivity.class);
                 break;
             default:
+                // Change first loaded city
+                SharedPreferences.Editor editor = sharedCity.edit();
+                editor.putInt(cityKey, id);
+                editor.commit();
+                reloadPagerView(id);
 
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void reloadPagerView(int cityNumber) {
+
+        Log.d("MyLog", "Reload Page View");
+        Log.d("MyLog", "CIty " + weekSiteList.get(cityNumber).getCity());
+
+        //pagerAdapter.reloadData(weekSiteList.get(cityNumber).getListOfDaySite());
+        WeekSite weekForCity = weekSiteList.get(cityNumber);
+        City cityForDisplaying = weekForCity.getCity();
+        toolbar.setTitle(cityForDisplaying.getWeatherIn());
+        pagerAdapter = new DayPagerAdapter(getSupportFragmentManager(), weekForCity.getListOfDaySite());
+        pager.setAdapter(pagerAdapter);
     }
 
 
@@ -224,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     ArrayList<RealmCity> citiesList = loadBD();
 
-                    loadWeatherForCities(citiesList);
+                    loadWeatherForCities(realmListToList(citiesList));
                     break;
             }
         }

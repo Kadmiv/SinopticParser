@@ -7,10 +7,14 @@
         android:id="@+id/add_city"
         android:icon="@android:drawable/ic_input_add"
         android:title="@string/add_new_city" />
+    <submenu
+        android:id="@+id/city_group"
+        android:checkableBehavior="single"></submenu>
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_menu_settings"
         android:title="@string/action_settings" />
+
 
     <item android:title="Communicate">
         <menu>

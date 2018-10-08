@@ -2,7 +2,7 @@ package com.gaijin.sinopticparser.parsers_classes;
 
 import android.util.Log;
 
-import com.gaijin.sinopticparser.views.fragments.WeatherView;
+import com.gaijin.sinopticparser.views.fragments.SeparateTime;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -24,19 +24,19 @@ public class SinopticParser {
     private final String LEFT_PART = "lSide";
     private final String IMAGE_OF_NOW = "img";
     private final String TEMP_OF_NOW = "today-temp";
-    private final List<String> dayTimesList = Arrays.asList("p1 bR ", "p1 ", "p2 bR ", "p3 ", "p3 bR ", "p4 ", "p4 bR ",
+    private final List<String> dayTimesList_1 = Arrays.asList("p1 ", "p2 bR ", "p3 ", "p4 bR ",
             "p5 ", "p6 bR ", "p7 ", "p8 ");
+    final List<String> dayTimesList_2 = Arrays.asList("p1 bR ", "p2 bR ", "p3 bR ", "p4 ");
+
     private final String currentTag = "cur";
     private final List<String> nowList = Arrays.asList(IMAGE_OF_NOW, TEMP_OF_NOW);
 
     private final List<String> METRICS_1 = Arrays.asList("Температура: %sC", "чувствуется как: %sC",
-            "Давление: %s мм", "Влажность: %s %%", "Ветер: %s", "Вероятность осадков: %s %%");
+            "Давление: %s мм", "Влажность: %s %%", "Ветер: %s", "Вероятность осадков: %s %%", "Время: %s");
 
-    private final List<String> Times_1 = Arrays.asList("0:00", "3:00", "6:00", "9:00", "12:00", "15:00", "18:00", "21:00");
-    private final List<String> Times_2 = Arrays.asList("3:00", "9:00", "15:00", "21:00");
 
     //View weather for now
-    private WeatherView nowView;
+    private SeparateTime nowView;
 
     private String lang = "ru";
 
@@ -44,9 +44,9 @@ public class SinopticParser {
      * This function parse separate time of day
      *
      * @param html - day page representation on html-format
-     * @return - list of WeatherView class which contains information for each separate time of  day
+     * @return - list of SeparateTime class which contains information for each separate time of  day
      */
-    public ArrayList<WeatherView> getTimesOfDay(String html) {
+    public ArrayList<SeparateTime> getTimesOfDay(String html) {
         Document doc = Jsoup.parse(html);
 
         Element body = doc.body();
@@ -55,7 +55,7 @@ public class SinopticParser {
         // On this part we check lang for metrics
         List<String> metrics = METRICS_1;
 
-        ArrayList<WeatherView> views = parseAllDay(body, dayTimesList, metrics);
+        ArrayList<SeparateTime> views = parseAllDay(body, metrics);
         try {
             parseNow(now, nowList);
         } catch (Exception exe) {
@@ -68,30 +68,29 @@ public class SinopticParser {
     /**
      * Function parse html representation of day to separate time views
      *
-     * @param body         - html representation of day
-     * @param dayTimesList - separate times classes
-     * @param metrics      - metrics for finding
-     * @return - list of WeatherView class which contains information for each separate time of day
+     * @param body    - html representation of day
+     * @param metrics - metrics for finding
+     * @return - list of SeparateTime class which contains information for each separate time of day
      */
-    private ArrayList<WeatherView> parseAllDay(Element body, List<String> dayTimesList, List<String> metrics) {
+    private ArrayList<SeparateTime> parseAllDay(Element body, List<String> metrics) {
 
-        ArrayList<WeatherView> viewList = new ArrayList<>();
+        ArrayList<SeparateTime> viewList = new ArrayList<>();
 
-        Elements timeOfDay = body.getElementsByClass(dayTimesList.get(0));
-        List<String> timeOfView = Times_2;
+        List<String> dayTimesList = dayTimesList_1;
+        String time = dayTimesList.get(0);
+
+        /*Determining the number of times on the site page*/
+        Elements timeOfDay = body.getElementsByClass(time);
         if (timeOfDay.size() == 0) {
-            timeOfView = Times_1;
+            dayTimesList = dayTimesList_2;
         }
 
-//        String changedItem = dayTimesList.get(itemForChange) + currentTag;
-//        dayTimesList.set(itemForChange, changedItem);
         for (int i = 0; i < dayTimesList.size(); i++) {
 
-            String time = dayTimesList.get(i);
+            time = dayTimesList.get(i);
             timeOfDay = body.getElementsByClass(time);
-            WeatherView newView;
+            SeparateTime newView;
 
-            // day.get
             if (timeOfDay.size() == 0) {
                 String changedItem = dayTimesList.get(i) + currentTag;
                 dayTimesList.set(i, changedItem);
@@ -100,13 +99,13 @@ public class SinopticParser {
                 if (timeOfDay.size() == 0) {
                     continue;
                 } else {
-                    newView = parseView(timeOfDay, metrics);
+                    newView = parseSeparateTime(timeOfDay, metrics);
                     nowView = newView;
                 }
             } else {
-                newView = parseView(timeOfDay, metrics);
+                newView = parseSeparateTime(timeOfDay, metrics);
             }
-//            newView.setTime(timeOfView.get(i));
+
             viewList.add(newView);
         }
         Log.d("MyLog", "Sinoptic parser 2 daySite.size() " + viewList.size());
@@ -118,10 +117,10 @@ public class SinopticParser {
      *
      * @param timeOfDay - separate time of day information
      * @param metrics   - metrics for finding
-     * @return - WeatherView object which contains all information for one separate time of day
+     * @return - SeparateTime object which contains all information for one separate time of day
      */
-    private WeatherView parseView(Elements timeOfDay, List<String> metrics) {
-        WeatherView newView = new WeatherView();
+    private SeparateTime parseSeparateTime(Elements timeOfDay, List<String> metrics) {
+        SeparateTime newView = new SeparateTime();
 
         /*Parse image*/
         String scrImage = parseSourceImage(timeOfDay);
@@ -154,12 +153,16 @@ public class SinopticParser {
         }
         precipit = String.format(metrics.get(5), precipit);
         newView.setPrecipitation(precipit);
+        /*Parse Local time*/
+        String localTime = timeOfDay.get(0).text().replace(" ", "");
+        localTime = String.format(metrics.get(6), localTime);
+        newView.setTime(localTime);
 
         return newView;
     }
 
     /**
-     * This function change information in WeatherView list for now time view
+     * This function change information in SeparateTime list for now time view
      *
      * @param nowView     - html representation of now weather information
      * @param dayViewList - separate view of times

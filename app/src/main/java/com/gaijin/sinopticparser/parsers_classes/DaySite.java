@@ -3,7 +3,8 @@ package com.gaijin.sinopticparser.parsers_classes;
 
 import android.util.Log;
 
-import com.gaijin.sinopticparser.views.fragments.WeatherView;
+import com.gaijin.sinopticparser.views.fragments.City;
+import com.gaijin.sinopticparser.views.fragments.SeparateTime;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -17,7 +18,9 @@ import java.util.ArrayList;
  */
 public class DaySite {
 
-    /**Name of classes for find in HTML code of site */
+    /**
+     * Name of classes for find in HTML code of site
+     */
     public static final String HEAD_OF_DAY = "main loaded";
     // public static final String ICON_OF_DAY = "weatherIco d100";
     public static final String TEMP_OF_DAY = "temperature";
@@ -26,18 +29,31 @@ public class DaySite {
     private final String DAY_INFO = "infoDaylight";
     private final String ALL_DAY_DESCRIPTION = "wDescription";
 
-     /** Variable which contains temperature of day*/
+    /**
+     * Variable which contains temperature of day
+     */
     private String minTemp;
     private String maxTemp;
-     /** Variable which contains image weather of day*/
+    /**
+     * Variable which contains image weather of day
+     */
     private String mainImage;
-     /** Variable which describes the length of the day*/
+    /**
+     * Variable which describes the length of the day
+     */
     private String timeOfDay;
     private String iconOfDay;
-     /** Variable which contains weather description of the day*/
+    /**
+     * Variable which contains weather description of the day
+     */
     private String allDayDescription;
-     /** Variable which contains weather for separate time*/
-    private ArrayList<WeatherView> weatherOnDay;
+    /**
+     * Variable which contains weather for separate time
+     */
+    private ArrayList<SeparateTime> weatherOnDay;
+    /* Variable which contains date of day*/
+    private String date;
+    private City city;
 
     public DaySite() {
     }
@@ -69,7 +85,7 @@ public class DaySite {
         SinopticParser sinoptic = new SinopticParser();
         //sinoptic.setLanguach("");
 
-        System.out.println(toString());
+        System.out.println("\n" + toString() + "\n");
 
         weatherOnDay = sinoptic.getTimesOfDay(body.html());
     }
@@ -99,7 +115,7 @@ public class DaySite {
         return image.attr("src");
     }
 
-    public ArrayList<WeatherView> getWeatherOnDay() {
+    public ArrayList<SeparateTime> getWeatherOnDay() {
         Log.d("MyLog", "DaySite class daySite.size() " + weatherOnDay.size());
         return weatherOnDay;
     }
@@ -110,6 +126,22 @@ public class DaySite {
 
     public void setMainImage(String mainImage) {
         this.mainImage = mainImage;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 
     @Override
