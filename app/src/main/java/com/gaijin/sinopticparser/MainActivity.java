@@ -32,10 +32,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Variables {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        Variables {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -85,6 +87,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        realmDB.close();
+    }
+
+    /**
+     * This function need, because Realm Objects not be used in not main threads
+     *
+     * @param citiesList - list of cities RealmCity objects
+     * @return - list of cities City objects
+     */
     private ArrayList<City> realmListToList(ArrayList<RealmCity> citiesList) {
         ArrayList<City> cloneList = new ArrayList<>();
         int i = 0;
@@ -124,6 +138,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return list;
     }
 
+    /**
+     * This function add item Navigation View, which correspond to the names of cities from the database
+     *
+     * @param cities - cities list
+     */
     private void createCitiesMenu(ArrayList<RealmCity> cities) {
         // Create Cities menu
         if (subMenu == null) {
@@ -194,6 +213,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (cityNumber < weekSiteList.size() && weekSiteList.get(cityNumber) != null) {
             Log.d("MyLog", "Pager view must be loaded City id =" + weekSiteList.get(cityNumber).getCity());
             ArrayList<DaySite> daySiteList = weekSiteList.get(cityNumber).getListOfDaySite();
+            // Set name of city in toolbar
+            toolbar.setTitle(weekSiteList.get(cityNumber).getCity().getWeatherIn());
             // Create adapter for normalization information for view
             pagerAdapter = new DayPagerAdapter(getSupportFragmentManager(), daySiteList);
             pager.setAdapter(pagerAdapter);
@@ -228,8 +249,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -239,19 +258,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         switch (id) {
             case R.id.add_city:
-                //Toast.makeText(this, "Add city", Toast.LENGTH_SHORT).show();
                 intent = new Intent(this, SearchCityActivity.class);
                 startActivityForResult(intent, 1);
                 break;
             case R.id.action_settings:
-                //Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
-                //intent = new Intent(this, SearchCityActivity.class);
+                //intent = new Intent(this, SettingsActivity.class);
                 break;
             default:
                 // Change first loaded city
-                SharedPreferences.Editor editor = sharedCity.edit();
-                editor.putInt(cityKey, id);
-                editor.commit();
+                changeFirstLoadCity(id);
                 reloadPagerView(id);
 
         }
@@ -266,12 +281,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("MyLog", "Reload Page View");
         Log.d("MyLog", "CIty " + weekSiteList.get(cityNumber).getCity());
 
-        //pagerAdapter.reloadData(weekSiteList.get(cityNumber).getListOfDaySite());
-        WeekSite weekForCity = weekSiteList.get(cityNumber);
-        City cityForDisplaying = weekForCity.getCity();
-        toolbar.setTitle(cityForDisplaying.getWeatherIn());
-        pagerAdapter = new DayPagerAdapter(getSupportFragmentManager(), weekForCity.getListOfDaySite());
-        pager.setAdapter(pagerAdapter);
+        pagerAdapter.reloadData(weekSiteList.get(cityNumber).getListOfDaySite());
+//        WeekSite weekForCity = weekSiteList.get(cityNumber);
+//        City cityForDisplaying = weekForCity.getCity();
+//        toolbar.setTitle(cityForDisplaying.getWeatherIn());
+//        pagerAdapter = new DayPagerAdapter(getSupportFragmentManager(), weekForCity.getListOfDaySite());
+//        pager.setAdapter(pagerAdapter);
     }
 
 
@@ -285,17 +300,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     String cityInfo = data.getStringExtra("cityInfo");
                     RealmCity city = new RealmCity(cityInfo.split("\\|"));
                     Log.d("MyLog", "Returned city is  " + cityInfo);
+
+                    // Find same city in BD
+                    for (int i = 0; i < cityList.size(); i++) {
+                        // Compare link in cities
+                        if (city.getCityLink().equals(cityList.get(i).getCityLink())) {
+                            return;
+                        }
+                    }
+
+                    // If duplicate not find add new city to DB
                     realmDB.beginTransaction();
-                    realmDB.insert(city);
+                    realmDB.insertOrUpdate(city);
                     realmDB.commitTransaction();
 
+                    // Reload city list from DB add reload menu, which contains cities names
                     ArrayList<RealmCity> citiesList = loadCitiesFromBD();
-
+                    cityNumber = citiesList.size() - 1;
+                    changeFirstLoadCity(cityNumber);
                     loadWeatherForCities(realmListToList(citiesList));
                     break;
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    // Change last selected item city in share preferences
+    public void changeFirstLoadCity(int cityNumber) {
+        SharedPreferences.Editor editor = sharedCity.edit();
+        editor.putInt(cityKey, cityNumber);
+        editor.commit();
     }
 
 }

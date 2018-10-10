@@ -31,6 +31,7 @@ import it.sephiroth.android.library.picasso.Picasso;
  */
 public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
 
+    /*Metrics */
     private final List<String> METRICS_1 = Arrays.asList("C", "м/сек", "%", "мм");
 
     private Context context;
@@ -81,7 +82,7 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
         holder.pressure.setText(pressure);
 
         //bind short description view
-        holder.shortDescription.setText(separateTime.getShortDescription());
+        //holder.shortDescription.setText(separateTime.getShortDescription());
 
         //bind image of weather view
 
@@ -115,8 +116,8 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
         TextView humidity;
         @BindView(R.id.time)
         TextView time;
-        @BindView(R.id.short_description)
-        TextView shortDescription;
+//        @BindView(R.id.short_description)
+//        TextView shortDescription;
         @BindView(R.id.weather_image)
         ImageView weatherImage;
         @BindView(R.id.wind_icon)
@@ -127,8 +128,12 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
             ButterKnife.bind(this, itemView);
         }
 
+        /**
+         * In this function we analyzed direction of wind, and change wind icon
+         * @param windDirection - wind direction code s
+         */
         public void setWindIcon(String windDirection) {
-            // Log.d("MyLog", "Wind direction" + windDirection);
+
             int resId = 0;
             switch (windDirection.toLowerCase()) {
                 case "n":

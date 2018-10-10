@@ -2,6 +2,7 @@ package com.gaijin.sinopticparser.views.fragments;
 
 import com.gaijin.sinopticparser.components.ICity;
 
+import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
 /**
@@ -14,7 +15,9 @@ import io.realm.annotations.Required;
 public class City implements ICity {
 
     private static final String WEATHER_IN = "Погода в ";
-    @Required
+
+    @PrimaryKey
+    private long id;
     /* Name of city */
     private String cityName;
     /* Region of city1 */

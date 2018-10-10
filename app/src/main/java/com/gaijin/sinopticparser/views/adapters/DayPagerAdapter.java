@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gaijin.sinopticparser.R;
-import com.gaijin.sinopticparser.views.adapters.DayAdapter;
 import com.gaijin.sinopticparser.parsers_classes.DaySite;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class DayPagerAdapter extends FragmentPagerAdapter {
         this.data = data;
     }
 
-    public void reloadData(ArrayList<DaySite> data){
+    public void reloadData(ArrayList<DaySite> data) {
         this.data = data;
         notifyDataSetChanged();
     }
@@ -51,15 +50,14 @@ public class DayPagerAdapter extends FragmentPagerAdapter {
     @SuppressLint("ValidFragment")
     static class ViewPageFragment extends Fragment {
 
-        static final String ARGUMENT_PAGE_NUMBER = "arg_page_number";
+        static final String PAGER_KEY = "page_number";
 
         int pageNumber;
-
 
         static ViewPageFragment newInstance(int page) {
             ViewPageFragment pageFragment = new ViewPageFragment();
             Bundle arguments = new Bundle();
-            arguments.putInt(ARGUMENT_PAGE_NUMBER, page);
+            arguments.putInt(PAGER_KEY, page);
             pageFragment.setArguments(arguments);
             return pageFragment;
         }
@@ -67,7 +65,7 @@ public class DayPagerAdapter extends FragmentPagerAdapter {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            pageNumber = getArguments().getInt(ARGUMENT_PAGE_NUMBER);
+            pageNumber = getArguments().getInt(PAGER_KEY);
         }
 
         @Override
@@ -75,11 +73,10 @@ public class DayPagerAdapter extends FragmentPagerAdapter {
                                  Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.page_fragment, null);
 
+            // Create recycler view for page, which contain all information for day weather
             RecyclerView dayView = (RecyclerView) view.findViewById(R.id.day_view);
-            //RecyclerView.LayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             RecyclerView.LayoutManager manager = new LinearLayoutManager(this.getContext(), VERTICAL, false);
             dayView.setLayoutManager(manager);
-            Log.d("MyLog", "daySite.get(0).getWeatherOnDay().size() " + data.get(pageNumber).getWeatherOnDay().size());
             DayAdapter adapter = new DayAdapter(view.getContext(), data.get(pageNumber).getWeatherOnDay());
             dayView.setAdapter(adapter);
             return view;

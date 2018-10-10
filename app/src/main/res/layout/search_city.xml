@@ -7,12 +7,22 @@
     android:layout_height="match_parent">
 
 
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/windmill_1"
+        app:layout_constraintBottom_toBottomOf="@+id/city_variants"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp" />
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/nameLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="left"
         android:orientation="horizontal"
+        android:textColorHint="@color/colorPrimaryDark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,6 +37,9 @@
             android:hint="@string/entry_name"
             android:inputType="textAutoCorrect"
             android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,6 +49,7 @@
 
     <ListView
         android:id="@+id/city_variants"
+        style="@android:style/Widget.DeviceDefault.ExpandableListView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="8dp"

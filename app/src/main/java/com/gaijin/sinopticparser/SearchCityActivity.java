@@ -62,7 +62,6 @@ public class SearchCityActivity extends AppCompatActivity implements TextWatcher
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         Observable.just(cityName.getText().toString())
-
                 .map(new Function<String, ArrayList<String>>() {
                     @Override
                     public ArrayList<String> apply(String cityName) throws Exception {
