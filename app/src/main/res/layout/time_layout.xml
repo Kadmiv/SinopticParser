@@ -20,10 +20,11 @@
                 android:id="@+id/weather_image"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                app:layout_constraintBottom_toTopOf="@+id/humidity"
+                android:layout_marginTop="52dp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.986"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/description"
+                app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@android:drawable/ic_menu_camera" />
 
             <TextView
@@ -32,10 +33,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="TextView"
+                android:text="777 мм.рт.ст"
                 android:textAlignment="viewEnd"
-                android:textColor="?attr/actionModeSplitBackground"
-                android:textSize="22sp"
+                android:textColor="@android:color/background_light"
+                android:textSize="22dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -45,78 +46,65 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="16dp"
-                android:text="TextView"
+                android:text="24 м/с"
                 android:textAlignment="viewEnd"
-                android:textColor="@android:color/holo_orange_light"
-                android:textSize="22sp"
+                android:textColor="@android:color/background_light"
+                android:textSize="22dp"
                 app:layout_constraintBottom_toTopOf="@+id/pressure"
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <TextView
                 android:id="@+id/precipitation"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_marginStart="16dp"
-                android:text="TextView"
+                android:layout_height="30dp"
+                android:text="100%"
                 android:textAlignment="viewStart"
-                android:textColor="@android:color/background_dark"
-                android:textSize="22sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:textColor="@android:color/background_light"
+                android:textSize="22dp"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView7"
+                app:layout_constraintStart_toEndOf="@+id/imageView7"
+                app:layout_constraintTop_toTopOf="@+id/imageView7" />
 
             <TextView
                 android:id="@+id/humidity"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="30dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
                 android:text="TextView"
                 android:textAlignment="viewStart"
-                android:textColor="@android:color/background_dark"
-                android:textSize="22sp"
-                app:layout_constraintBottom_toTopOf="@+id/precipitation"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/temp_2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="24dp"
-                android:text="TextView"
-                android:textAlignment="viewEnd"
-                android:textColor="@android:color/holo_green_light"
-                android:textSize="22sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/temp_1" />
+                android:textColor="@android:color/background_light"
+                android:textSize="22dp"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView6"
+                app:layout_constraintStart_toEndOf="@+id/imageView6"
+                app:layout_constraintTop_toTopOf="@+id/imageView6" />
 
             <TextView
                 android:id="@+id/temp_1"
-                android:layout_width="wrap_content"
+                android:layout_width="87dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="24dp"
-                android:text="TextView"
+                android:text="+23/+23"
                 android:textAlignment="viewEnd"
-                android:textColor="@android:color/holo_green_light"
-                android:textSize="22sp"
+                android:textColor="@android:color/background_light"
+                android:textSize="22dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/description"
                 android:layout_width="wrap_content"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="2dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="32dp"
-                android:text="Ясно"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="52dp"
+                android:text="Облачно с прояснениями, сильный дождь"
                 android:textAlignment="viewStart"
-                android:textColor="@android:color/holo_blue_dark"
-                android:textSize="42sp"
+                android:textColor="@android:color/background_light"
+                android:textSize="33dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.028"
+                app:layout_constraintHorizontal_bias="0.307"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -124,11 +112,61 @@
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginStart="27dp"
+                android:layout_marginTop="16dp"
                 android:text="TextView"
-                android:textColor="@android:color/holo_purple"
-                app:layout_constraintBottom_toTopOf="@+id/description"
-                app:layout_constraintStart_toStartOf="@+id/description" />
+                android:textColor="@android:color/holo_orange_dark"
+                android:textSize="14dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
+                android:background="@drawable/thermometer"
+                app:layout_constraintBottom_toBottomOf="@+id/temp_1"
+                app:layout_constraintEnd_toStartOf="@+id/temp_1"
+                app:layout_constraintTop_toTopOf="@+id/temp_1" />
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="59dp"
+                android:layout_height="30dp"
+                android:background="@drawable/wind_icon_n"
+                app:layout_constraintBottom_toBottomOf="@+id/wind"
+                app:layout_constraintEnd_toStartOf="@+id/wind"
+                app:layout_constraintTop_toTopOf="@+id/wind"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/barometer_icon"
+                app:layout_constraintBottom_toBottomOf="@+id/pressure"
+                app:layout_constraintEnd_toStartOf="@+id/pressure"
+                app:layout_constraintTop_toTopOf="@+id/pressure" />
+
+            <ImageView
+                android:id="@+id/imageView6"
+                android:layout_width="30dp"
+                android:layout_height="36dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/humidity_icon"
+                app:layout_constraintBottom_toTopOf="@+id/imageView7"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView7"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/humidity_precipitation_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
         </android.support.constraint.ConstraintLayout>
 
