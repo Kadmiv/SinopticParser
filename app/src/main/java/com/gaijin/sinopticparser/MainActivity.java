@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.constraint.Group;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,7 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
 
 import com.gaijin.sinopticparser.views.fragments.City;
 import com.gaijin.sinopticparser.views.adapters.DayPagerAdapter;
@@ -31,7 +28,6 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -39,7 +35,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,View.OnLongClickListener, Variables {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Variables {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -52,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     // Object of DB
-    Realm realm = null;
+    Realm realmDB = null;
     // Adapter for PagerView
     DayPagerAdapter pagerAdapter;
     // Change cities submenu in NavigationView
@@ -81,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         // Load city from BD
-        ArrayList<RealmCity> citiesList = loadBD();
+        ArrayList<RealmCity> citiesList = loadCitiesFromBD();
 
         // Find and load information in web site Sinoptic for all cities
         ArrayList<City> cities = realmListToList(citiesList);
@@ -107,21 +103,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      *
      * @return list of cities for further processing
      */
-    private ArrayList<RealmCity> loadBD() {
+    private ArrayList<RealmCity> loadCitiesFromBD() {
 
         // Initialize Realm (just once per application)
         Realm.init(this);
 
         // Get a Realm instance for this thread
-        realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        cityList = realm.where(RealmCity.class).findAll();
+        realmDB = Realm.getDefaultInstance();
+        realmDB.beginTransaction();
+        cityList = realmDB.where(RealmCity.class).findAll();
 
         ArrayList<RealmCity> list = new ArrayList<>();
         for (RealmCity city : cityList) {
             list.add(city);
         }
-        realm.commitTransaction();
+        realmDB.commitTransaction();
 
         createCitiesMenu(list);
 
@@ -232,22 +228,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -263,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 intent = new Intent(this, SearchCityActivity.class);
                 startActivityForResult(intent, 1);
                 break;
-            case R.id.settings:
+            case R.id.action_settings:
                 //Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
                 //intent = new Intent(this, SearchCityActivity.class);
                 break;
@@ -305,11 +285,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     String cityInfo = data.getStringExtra("cityInfo");
                     RealmCity city = new RealmCity(cityInfo.split("\\|"));
                     Log.d("MyLog", "Returned city is  " + cityInfo);
-                    realm.beginTransaction();
-                    realm.insert(city);
-                    realm.commitTransaction();
+                    realmDB.beginTransaction();
+                    realmDB.insert(city);
+                    realmDB.commitTransaction();
 
-                    ArrayList<RealmCity> citiesList = loadBD();
+                    ArrayList<RealmCity> citiesList = loadCitiesFromBD();
 
                     loadWeatherForCities(realmListToList(citiesList));
                     break;
@@ -318,9 +298,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
-    @Override
-    public boolean onLongClick(View v) {
-        return false;
-    }
 }

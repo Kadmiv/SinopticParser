@@ -31,9 +31,6 @@ public class SinopticParser {
     private final String currentTag = "cur";
     private final List<String> nowList = Arrays.asList(IMAGE_OF_NOW, TEMP_OF_NOW);
 
-    private final List<String> METRICS_1 = Arrays.asList("Температура: %sC", "чувствуется как: %sC",
-            "Давление: %s мм", "Влажность: %s %%", "Ветер: %s", "Вероятность осадков: %s %%", "Время: %s");
-
 
     //View weather for now
     private SeparateTime nowView;
@@ -53,9 +50,7 @@ public class SinopticParser {
         Elements now = body.getElementsByClass(LEFT_PART);
 
         // On this part we check lang for metrics
-        List<String> metrics = METRICS_1;
-
-        ArrayList<SeparateTime> views = parseAllDay(body, metrics);
+        ArrayList<SeparateTime> views = parseAllDay(body);
         try {
             parseNow(now, nowList);
         } catch (Exception exe) {
@@ -68,11 +63,10 @@ public class SinopticParser {
     /**
      * Function parse html representation of day to separate time views
      *
-     * @param body    - html representation of day
-     * @param metrics - metrics for finding
+     * @param body - html representation of day
      * @return - list of SeparateTime class which contains information for each separate time of day
      */
-    private ArrayList<SeparateTime> parseAllDay(Element body, List<String> metrics) {
+    private ArrayList<SeparateTime> parseAllDay(Element body) {
 
         ArrayList<SeparateTime> viewList = new ArrayList<>();
 
@@ -99,11 +93,11 @@ public class SinopticParser {
                 if (timeOfDay.size() == 0) {
                     continue;
                 } else {
-                    newView = parseSeparateTime(timeOfDay, metrics);
+                    newView = parseSeparateTime(timeOfDay);
                     nowView = newView;
                 }
             } else {
-                newView = parseSeparateTime(timeOfDay, metrics);
+                newView = parseSeparateTime(timeOfDay);
             }
 
             viewList.add(newView);
@@ -116,10 +110,9 @@ public class SinopticParser {
      * This function parse information for one separate time of day information
      *
      * @param timeOfDay - separate time of day information
-     * @param metrics   - metrics for finding
      * @return - SeparateTime object which contains all information for one separate time of day
      */
-    private SeparateTime parseSeparateTime(Elements timeOfDay, List<String> metrics) {
+    private SeparateTime parseSeparateTime(Elements timeOfDay) {
         SeparateTime newView = new SeparateTime();
 
         /*Parse image*/
@@ -129,33 +122,51 @@ public class SinopticParser {
         Element description = timeOfDay.get(1).select("div").first();
         String shortDescription = description.attr("title");
         newView.setShortDescription(shortDescription);
+
         /*Parse temperature*/
-        String temp_1 = String.format(metrics.get(0), timeOfDay.get(2).text());
-        newView.setTemp(temp_1);
+//        String temp_1 = String.format(metrics.get(0), timeOfDay.get(2).text());
+        String temp_1 = timeOfDay.get(2).text();
+        newView.setTemp_1(temp_1);
+
         /*Parse temperature 2*/
-        String temp_2 = String.format(metrics.get(1), timeOfDay.get(3).text());
+//        String temp_2 = String.format(metrics.get(1), timeOfDay.get(3).text());
+        String temp_2 = timeOfDay.get(3).text();
         newView.setTemp_2(temp_2);
+
         /*Parse Atmospher Pressure*/
-        String pressure = String.format(metrics.get(2), timeOfDay.get(4).text());
+//        String pressure = String.format(metrics.get(2), timeOfDay.get(4).text());
+        String pressure = timeOfDay.get(4).text();
         newView.setAtmoPressure(pressure);
+
         /*Parse Humidity*/
-        String humidity = String.format(metrics.get(3), timeOfDay.get(5).text());
+//        String humidity = String.format(metrics.get(3), timeOfDay.get(5).text());
+        String humidity = timeOfDay.get(5).text();
         newView.setHumidity(humidity);
+
         /*Parse Wind*/
         Element wind = timeOfDay.get(6).select("div").first();
-        String winds = wind.attr("data-tooltip");
-        winds = String.format(metrics.get(4), winds);
+
+        String winds = "0";
+        try {
+            Log.d("MyLog", "data-tooltip " + wind.attr("data-tooltip").toString());
+            winds = wind.attr("data-tooltip").split(" ")[1];
+        } catch (Exception ex) {
+        }
         newView.setWind(winds);
+        String windDirection = wind.attr("class").split(" ")[2];
+        windDirection = windDirection.substring(windDirection.length() - 2).replace("-", "");
+        newView.setWindDirection(windDirection);
+
         /*Parse Precipitation*/
         String precipit = timeOfDay.get(7).text();
         if (precipit.equals("-")) {
             precipit = "0";
         }
-        precipit = String.format(metrics.get(5), precipit);
+//        precipit = String.format(metrics.get(5), precipit);
         newView.setPrecipitation(precipit);
+
         /*Parse Local time*/
         String localTime = timeOfDay.get(0).text().replace(" ", "");
-        localTime = String.format(metrics.get(6), localTime);
         newView.setTime(localTime);
 
         return newView;
@@ -170,16 +181,16 @@ public class SinopticParser {
     private void parseNow(Elements nowView, List<String> dayViewList) {
 
         /*First parse image of weather*/
-        String srcImage = parseSourceImage(nowView);
-        Element image = nowView.select("img").first();
-        String shortDescription = image.attr("alt");
-        this.nowView.setImage(srcImage);
-        this.nowView.setShortDescription(shortDescription);
+//        String srcImage = parseSourceImage(nowView);
+//        Element image = nowView.select("img").first();
+//        String shortDescription = image.attr("alt");
+//        this.nowView.setImage(srcImage);
+//        this.nowView.setShortDescription(shortDescription);
 
         /*Next find temp of now*/
         Elements temp = nowView.get(0).getElementsByClass(dayViewList.get(1));
-        String nowTemp = temp.get(0).text();
-        this.nowView.setTemp(nowTemp);
+        String nowTemp = temp.get(0).text().replace("C", "");
+        this.nowView.setTemp_1(nowTemp);
     }
 
     /**

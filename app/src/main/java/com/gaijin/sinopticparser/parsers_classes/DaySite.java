@@ -86,9 +86,9 @@ public class DaySite {
         SinopticParser sinoptic = new SinopticParser();
         //sinoptic.setLanguach("");
 
-        System.out.println("\n" + toString() + "\n");
-
         weatherOnDay = sinoptic.getTimesOfDay(body.html());
+
+        System.out.println("\n" + this.toString() + "\n");
     }
 
     private String parseDayTemperature(Element temperature, String type) {
@@ -151,7 +151,7 @@ public class DaySite {
         String info = String.format(" ICON: %s\n MIN: %s\n MAX: %s\n TIME OF DAY: %s\n DAY DESCRIPTION: %s\n ",
                 iconOfDay, minTemp, maxTemp, timeOfDay, allDayDescription);
 
-        if (weatherOnDay != null) {
+        if (weatherOnDay.size() > 0) {
             for (int i = 0; i < weatherOnDay.size(); i++) {
                 info += String.format("\n\nTime of day %s\n", i + 1) + weatherOnDay.get(i).toString();
             }
