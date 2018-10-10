@@ -54,6 +54,7 @@ public class DaySite {
     /* Variable which contains date of day*/
     private String date;
     private City city;
+    private Integer positionInList;
 
     public DaySite() {
     }
@@ -157,5 +158,13 @@ public class DaySite {
         }
 
         return info;
+    }
+
+    public void setPositionInList(Integer positionInList) {
+        this.positionInList = positionInList;
+    }
+
+    public int getPositionInList() {
+        return positionInList;
     }
 }

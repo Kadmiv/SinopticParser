@@ -52,58 +52,72 @@ public class WeekSite implements Variables {
      * @return -
      */
     public void parseWeek() {
-        listOfDaySite = new ArrayList<>(numberOfDay);
+
         long day = new Date().getTime();
 
-
-        Observable.range(0, numberOfDay)
-                .flatMap(integer -> Observable.just(integer)
-                        .map(new Function<Integer, DaySite>() {
-                            @Override
-                            public DaySite apply(Integer i) throws Exception {
-                                //Calculate date for creation link
-                                long linkDay = day + i * LENGTH_OF_DAY;
-                                Date findData = new Date(linkDay);
-                                String linkDate = dateFormat.format(findData);
-                                // Create a single link
-                                String allUrl = String.format("%s/%s/%s", MAIN_LINK, cityLink, linkDate);
-                                Log.d("MyLog", "Link " + allUrl + " day " + i);
-                                // Connect to server
-                                String page = httpConnect(allUrl);
-                                // Parse day HTML
-                                DaySite daySite = parseHtml(page);
-                                // Set date of day
-                                daySite.setDate(dayDateFormat.format(findData));
-                                return daySite;
-                            }
-                        })
-                        .subscribeOn(Schedulers.computation())
-                )
-                //.subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.computation())
-                .subscribe(daySite -> addToDaySiteList(daySite));
-
+        //so that there is no error java.lang.IndexOutOfBoundsException
+        listOfDaySite = new ArrayList<>();
 //        for (int i = 0; i < numberOfDay; i++) {
-//            //Calculate date for creation link
-//            long linkDay = day + i * LENGTH_OF_DAY;
-//            Date findData = new Date(linkDay);
-//            String linkDate = dateFormat.format(findData);
-//            // Create a single link
-//            String allUrl = String.format("%s/%s/%s", MAIN_LINK, cityLink, linkDate);
-//            // Connect to server
-//            String page = httpConnect(allUrl);
-//            // Parse day HTML
-//            DaySite daySite = parseHtml(page);
-//            // Set date of day
-//            daySite.setDate(dayDateFormat.format(findData));
-
-//            listOfDaySite.add(daySite);
+//            listOfDaySite.add(null);
 //        }
+//        Observable.range(0, numberOfDay)
+//                .flatMap(integer -> Observable.just(integer)
+//                        .map(new Function<Integer, DaySite>() {
+//                            @Override
+//                            public DaySite apply(Integer i) throws Exception {
+//                                //Calculate date for creation link
+//                                long linkDay = day + i * LENGTH_OF_DAY;
+//                                Date findData = new Date(linkDay);
+//                                String linkDate = dateFormat.format(findData);
+//                                // Create a single link
+//                                String allUrl = String.format("%s/%s/%s", MAIN_LINK, cityLink, linkDate);
+//                                Log.d("MyLog", "Link " + allUrl + " day " + i);
+//                                // Connect to server
+//                                String page = Jsoup.connect(allUrl)
+//                                        .timeout(5000)
+//                                        .get().html();
+//                                // httpConnect(allUrl);
+//                                // Parse day HTML
+//                                DaySite daySite = parseHtml(page);
+//                                // Set date of day
+//                                daySite.setDate(dayDateFormat.format(findData));
+//                                daySite.setPositionInList(i);
+//                                return daySite;
+//                            }
+//                        })
+//                        .subscribeOn(Schedulers.computation())
+//                )
+//                //.subscribeOn(Schedulers.newThread())
+//                .observeOn(Schedulers.computation())
+//                .subscribe(daySite -> addToDaySiteList(daySite));
+
+        for (int i = 0; i < numberOfDay; i++) {
+            //Calculate date for creation link
+            long linkDay = day + i * LENGTH_OF_DAY;
+            Date findData = new Date(linkDay);
+            String linkDate = dateFormat.format(findData);
+            // Create a single link
+            String allUrl = String.format("%s/%s/%s", MAIN_LINK, cityLink, linkDate);
+            // Connect to server
+            String page = null;
+            try {
+                page = Jsoup.connect(allUrl)
+                        .timeout(5000)
+                        .get().html();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // Parse day HTML
+            DaySite daySite = parseHtml(page);
+            // Set date of day
+            daySite.setDate(dayDateFormat.format(findData));
+            listOfDaySite.add(daySite);
+        }
     }
 
     private void addToDaySiteList(DaySite daySite) {
         //Log.e("MyLog", "Add to daySiteList" + daySite.getCity().getCityName());
-        listOfDaySite.add(daySite);
+        listOfDaySite.add(daySite.getPositionInList(), daySite);
     }
 
     /**

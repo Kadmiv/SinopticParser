@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 
 import com.gaijin.sinopticparser.views.fragments.City;
 import com.gaijin.sinopticparser.views.adapters.DayPagerAdapter;
@@ -38,7 +39,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Variables {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,View.OnLongClickListener, Variables {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -71,18 +72,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         cityNumber = sharedCity.getInt(cityKey, 0);
 
         this.setSupportActionBar(toolbar);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
-        Menu menu = navigationView.getMenu();
-        subMenu = menu.addSubMenu("Cities:");
-
 
         // Load city from BD
         ArrayList<RealmCity> citiesList = loadBD();
+
         // Find and load information in web site Sinoptic for all cities
         ArrayList<City> cities = realmListToList(citiesList);
         loadWeatherForCities(cities);
@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             City newCity = new City();
             city.clone(newCity);
             cloneList.add(newCity);
-            addToCityGroup(newCity, i);
             i++;
         }
 
@@ -113,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Initialize Realm (just once per application)
         Realm.init(this);
 
-
         // Get a Realm instance for this thread
         realm = Realm.getDefaultInstance();
         realm.beginTransaction();
@@ -123,17 +121,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (RealmCity city : cityList) {
             list.add(city);
         }
-        // Remove all items from subMenu of city list
-        for (int i = 0; i < list.size(); i++) {
-            try {
-                subMenu.removeItem(i);
-            } catch (Exception ex) {
-
-            }
-        }
         realm.commitTransaction();
 
+        createCitiesMenu(list);
+
         return list;
+    }
+
+    private void createCitiesMenu(ArrayList<RealmCity> cities) {
+        // Create Cities menu
+        if (subMenu == null) {
+            Menu menu = navigationView.getMenu();
+            subMenu = menu.addSubMenu("Cities:");
+        }
+        if (!cities.isEmpty()) {
+            // Remove all items from subMenu of city list
+            for (int i = 0; i < cities.size(); i++) {
+                try {
+                    subMenu.removeItem(i);
+                } catch (Exception ex) {
+                }
+            }
+            //Add  Cities to Group
+            for (int itemId = 0; itemId < cities.size(); itemId++) {
+                RealmCity city = cities.get(itemId);
+                Log.d("MyLog", "City - " + city.getCityName() + " itemID " + itemId);
+                subMenu.add(R.id.city_group, itemId, Menu.NONE, city.getCityName());
+            }
+            navigationView.invalidate();
+        }
     }
 
     /**
@@ -165,20 +181,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         return weekSites;
                     }
                 })
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 // Load the received information for view to user
                 .subscribe(day -> createPagerView(day));
-    }
-
-    private void addToCityGroup(City city, int itemId) {
-
-        //subMenu.add(city.getCityName());
-        //subMenu.
-        Log.d("MyLog", "City - " + city.getCityName() + " itemID " + itemId);
-        subMenu.add(R.id.city_group, itemId, Menu.NONE, city.getCityName());
-        navigationView.invalidate();
-
     }
 
     /**
@@ -190,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.weekSiteList = weekSiteList;
 
         if (cityNumber < weekSiteList.size() && weekSiteList.get(cityNumber) != null) {
-            Log.d("MyLog", "Pager view must be loaded City id ="+weekSiteList.get(cityNumber).getCity());
+            Log.d("MyLog", "Pager view must be loaded City id =" + weekSiteList.get(cityNumber).getCity());
             ArrayList<DaySite> daySiteList = weekSiteList.get(cityNumber).getListOfDaySite();
             // Create adapter for normalization information for view
             pagerAdapter = new DayPagerAdapter(getSupportFragmentManager(), daySiteList);
@@ -310,5 +316,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    @Override
+    public boolean onLongClick(View v) {
+        return false;
     }
 }

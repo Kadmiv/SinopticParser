@@ -30,7 +30,7 @@ import io.reactivex.schedulers.Schedulers;
  * <p>
  * This activity for search cities
  */
-class SearchCityActivity extends AppCompatActivity implements TextWatcher, AdapterView.OnItemClickListener, Variables {
+public class SearchCityActivity extends AppCompatActivity implements TextWatcher, AdapterView.OnItemClickListener, Variables {
 
 
     @BindView(R.id.cityName)
